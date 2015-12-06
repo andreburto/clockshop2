@@ -1,14 +1,15 @@
+// Data writing constants
 const int MAX_LEN = 8;
 const int MAX_CNT = 255;
+// Pin constants
 const int pinSig = A0;
 const int pinDat = D0;
+// Timer constants
+unsigned long start;
+unsigned long lastSync;
+unsigned long oneHour = 60*60*1000;
 
-int count = 0;
-int adder = 1;
-const int flip = -1;
-
-
-// Write out a true or false signal
+// Write out a serial true or false signal
 void writeOut(int data) {
     // Start signal
     if (data == 1) {
@@ -28,7 +29,62 @@ void writeOut(int data) {
     delay(5);
 }
 
+// Write out an integer value as bits
+void intToOut(int nmbr) {
+  if (nmbr > MAX_CNT) { nmbr = MAX_CNT; }
+  for (int x = 0; x < MAX_LEN; x++) {
+    int v = (nmbr >> x) & 1;
+    writeOut(v);
+  }
+}
+
+void setHour(int h) {
+    intToOut(60);
+    intToOut(h);
+}
+
+void setMinute(int m) {
+    intToOut(61);
+    intToOut(m);
+}
+
+int setTime(String data_load) {
+    String t = data_load.substring(0,1);
+    String v = data_load.substring(1);
+    // Set the hour
+    if (t.equals("h")) {
+        setHour(v.toInt());
+        return 1;
+    }
+    // Set the minutes
+    else if (t.equals("m")) {
+        setMinute(v.toInt());
+        return 1;
+    }
+    // Unrecognized code
+    return -1;
+}
+
+void keepSync() {
+    if (millis() > start) {
+        if (millis() > lastSync+oneHour) {
+            Particle.syncTime();
+            // Wait for the return
+            delay(1000);
+            // Set the time
+            setHour(Time.hour());
+            setMinute(Time.minute());
+        }
+    }
+    else {
+        start = lastSync;
+    }
+}
+
 void setup() {
+    // Expose funtion
+    Particle.function("settime", setTime);
+    
     // Setup the mode of the pins
     pinMode(pinSig, OUTPUT);
     pinMode(pinDat, OUTPUT);
@@ -36,20 +92,24 @@ void setup() {
     // Start them low
     digitalWrite(pinSig, LOW);
     digitalWrite(pinDat, LOW);
+    
+    // Synchronize time
+    Particle.syncTime();
+    
+    delay(1000);
+    
+    // Set Time
+    Time.zone(-6);
+    setHour(Time.hour());
+    setMinute(Time.minute());
+    
+    // Start sync logic
+    start = millis();
 }
 
 void loop() {
-
-  for (int x = 0; x < MAX_LEN; x++) {
-    int v = (count >> x) & 1;
-    writeOut(v);
-  }
-
-  count += adder;
-
-  if (count < 1 || count > 255) {
-    adder *= flip;
-  }
-
-  delay(1000);
+    // Sync with the Particle cloud
+    keepSync();
+    // Keep some time difference between sync, lastSync, and millis()
+    delay(500);
 }

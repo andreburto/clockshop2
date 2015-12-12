@@ -35,6 +35,8 @@ unsigned long baset = 0;
 unsigned long start = 0;
 int the_hr = 0;
 int the_mn = 0;
+// Buffer timer
+unsigned long buff_timer = 0;
 
 // Resets the REAL_VALS array to all nulls and the RDR_CNT to 0.
 void cleanArray() {
@@ -119,6 +121,21 @@ void readSerial() {
   }  
 }
 
+// In case bad or incomplete data is sent, clean out the buffer every 500millis if any data.
+void checkBuffer() {
+  if (valCmd > -1 || valDat > -1) {
+    if (buff_timer == 0) {
+        buff_timer = millis() + 500;
+    } else {
+      if (millis() > buff_timer) {
+        cleanArray();
+        valCmd = -1;
+        valDat = -1;
+      }
+    }
+  }
+}
+
 // Updates the time every loop
 void tickTock() {
   // If the milliseconds are more than the set time
@@ -169,11 +186,16 @@ void setup() {
   baset = setBaseT();
   // Initialize the array
   cleanArray();
+  // Wait half a second
+  delay(500);
 }
 
 void loop() {
   // Read data coming in from the pins
   readSerial();
+
+  // Check for malformed data in the buffer, clean if needed.
+  checkBuffer();
 
   // Update the time
   tickTock();

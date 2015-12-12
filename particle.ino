@@ -8,6 +8,8 @@ const int pinDat = D0;
 unsigned long start;
 unsigned long lastSync;
 unsigned long oneHour = 60*60*1000;
+// Auto-set boolean
+bool autoset = true;
 
 // Write out a serial true or false signal
 void writeOut(int data) {
@@ -26,6 +28,7 @@ void writeOut(int data) {
     }
     digitalWrite(pinSig, LOW);
     
+    // Wait for a bit
     delay(5);
 }
 
@@ -51,6 +54,8 @@ void setMinute(int m) {
 int setTime(String data_load) {
     String t = data_load.substring(0,1);
     String v = data_load.substring(1);
+    // Once you manually set auto is tured off
+    autoset = false;
     // Set the hour
     if (t.equals("h")) {
         setHour(v.toInt());
@@ -65,15 +70,22 @@ int setTime(String data_load) {
     return -1;
 }
 
+void manualSync() {
+    Particle.syncTime();
+    // Wait for the return
+    delay(1000);
+    // Set the time
+    setHour(Time.hour());
+    setMinute(Time.minute());
+    // Resets autoset to true
+    autoset = true;
+}
+
 void keepSync() {
     if (millis() > start) {
+        if (autoset != true) return; 
         if (millis() > lastSync+oneHour) {
-            Particle.syncTime();
-            // Wait for the return
-            delay(1000);
-            // Set the time
-            setHour(Time.hour());
-            setMinute(Time.minute());
+            manualSync();
         }
     }
     else {
@@ -81,9 +93,18 @@ void keepSync() {
     }
 }
 
+int setManual(String val) {
+    if (val.equals("1")) {
+        autoset = true;
+    } else {
+        autoset = false;
+    }
+}
+
 void setup() {
     // Expose funtion
     Particle.function("settime", setTime);
+    Particle.function("setmanual", setManual);
     
     // Setup the mode of the pins
     pinMode(pinSig, OUTPUT);

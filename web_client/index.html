@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CLOCKSHOP 2</title>
+<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+// <![CDATA[
+
+// This is only to give me a little more control over debugging.
+function makeJson(data) {
+    if (typeof JSON != 'undefined') {
+        return JSON.parse(data);
+    } else {
+        return exec('('+data+')');
+    }
+}
+
+// Update the top display
+function changeModeDisplay(data) {
+    var json = makeJson(data);
+    if (json.status == 0) {
+        $("#ModeDisplay").css("background-color", '#e0e0e0');
+        $("#ModeDisplayText").text(json.msg);
+    } else {
+        window.autoSetStatus = json.autoset;
+        if (json.autoset == 1) {
+            $("#ModeDisplay").css("background-color", '#e0ffe0');
+            $("#ModeDisplayText").text("Auto On");
+        } else {
+            $("#ModeDisplay").css("background-color", '#ffe0e0');
+            $("#ModeDisplayText").text("Auto Off");
+        }
+    }
+}
+
+// Update time set message
+function changeSetDisplay(data) {
+    var json = makeJson(data);
+    if (json.status == 0) {
+        $("#SetDisplayText").css("color", "#ff0000");
+    } else {
+        $("#SetDisplayText").css("color", "#30a030");
+    }
+    $("#SetDisplayText").text(json.msg);
+}
+
+// ]]>
+</script>
+</head>
+<body style="margin:0px;padding:0px;text-align:center;background-color:#f0f0f0">
+<form style="margin:0px;padding:10px;text-align:center;" id="frmMain" action="index.html">
+    <div style="margin:auto;width:320px;height:auto;border:0px;">
+        <div id="ModeDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;">
+            <h1 id="ModeDisplayText"></h1>
+        </div>
+        <div id="SetDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;background-color:#e0e0ff;">
+            <div style="padding:10px;">
+                <input type="text" maxlength="2" style="font-size:16pt;width:25px;" id="hourVal" value="00" />
+                <span style="font-size:18pt;font-weight:bold;">:</span>
+                <input type="text" maxlength="2" style="font-size:16pt;width:25px;" id="minuteVal" value="00" />
+                <input type="button" id="SetButton" value="Set Time" style="font-size:16pt; background-color:#c0c0ff;" />
+            </div>
+            <h3 id="SetDisplayText"></h3>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+// <![CDATA[
+
+$(document).ready(function() {
+    window.autoSetStatus = 0;
+    
+    // Set time
+    var d = new Date();
+    var hrs = d.getHours();
+    var min = d.getMinutes();
+    $("#hourVal").val((hrs<10?'0'+hrs:hrs));
+    $("#minuteVal").val((min<10?'0'+min:min));
+    
+    // Get the auto time value
+    $.get("clock.php", changeModeDisplay);
+    
+    $("#ModeDisplay").click(function() {
+        var newSetVal = (autoSetStatus==1?0:1);
+        $.post("clock.php",
+               "{\"action\":\"auto\", \"mode\":"+newSetVal+"}",
+               changeModeDisplay,
+               "text");
+    });
+    
+    $("#SetButton").click(function() {
+        var h = $("#hourVal").val();
+        var m = $("#minuteVal").val();
+        $("#SetDisplayText").text("One moment");
+        $.post("clock.php",
+               "{\"action\":\"manual\", \"h\":\""+h+"\", \"m\":\""+m+"\"}",
+               changeSetDisplay,
+               "text");
+    });
+});
+
+// ]]>
+</script>
+</body>
+</html>

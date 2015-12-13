@@ -10,6 +10,8 @@ unsigned long lastSync;
 unsigned long oneHour = 60*60*1000;
 // Auto-set boolean
 int autoset = 1;
+// Play or Stop indicator
+int playstop = 0;
 
 // Write out a serial true or false signal
 void writeOut(int data) {
@@ -104,13 +106,28 @@ int setManual(String val) {
     return autoset;
 }
 
+int playStop(String val) {
+    if (playstop == 0) {
+        playstop = 1;
+        intToOut(70);
+        intToOut(0);
+    } else {
+        playstop = 0;
+        intToOut(71);
+        intToOut(0);
+    }
+    return playstop;
+}
+
 void setup() {
     // Expose funtion
     Particle.function("settime", setTime);
     Particle.function("setmanual", setManual);
+    Particle.function("playmusic", playStop);
     
     // Expose variables
     Particle.variable("autoset", &autoset, INT);
+    Particle.variable("playstop", &playstop, INT);
     
     // Setup the mode of the pins
     pinMode(pinSig, OUTPUT);

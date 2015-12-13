@@ -45,15 +45,23 @@ function changeSetDisplay(data) {
     $("#SetDisplayText").text(json.msg);
 }
 
+function changeMusicDisplay(data) {
+    var json = makeJson(data);
+    if (json.playstop == 0) {
+        $("#PlayDisplay").css("background-color", "#ff0000");
+        $("#SetPlayText").text("STOP");
+    } else {
+        $("#PlayDisplay").css("background-color", "#30c030");
+        $("#SetPlayText").text("PLAY");
+    }
+}
+
 // ]]>
 </script>
 </head>
 <body style="margin:0px;padding:0px;text-align:center;background-color:#f0f0f0">
 <form style="margin:0px;padding:10px;text-align:center;" id="frmMain" action="index.html">
     <div style="margin:auto;width:320px;height:auto;border:0px;">
-        <div id="ModeDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;">
-            <h1 id="ModeDisplayText"></h1>
-        </div>
         <div id="SetDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;background-color:#e0e0ff;">
             <div style="padding:10px;">
                 <input type="text" maxlength="2" style="font-size:16pt;width:25px;" id="hourVal" value="00" />
@@ -62,6 +70,12 @@ function changeSetDisplay(data) {
                 <input type="button" id="SetButton" value="Set Time" style="font-size:16pt; background-color:#c0c0ff;" />
             </div>
             <h3 id="SetDisplayText"></h3>
+        </div>
+        <div id="ModeDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;">
+            <h1 id="ModeDisplayText"></h1>
+        </div>
+        <div id="PlayDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;">
+            <h1 id="SetPlayText"></h1>
         </div>
     </div>
 </form>
@@ -81,6 +95,11 @@ $(document).ready(function() {
     // Get the auto time value
     $.get("clock.php", changeModeDisplay);
     
+    $.post("clock.php",
+           "{\"action\":\"checkmusic\"}",
+           changeMusicDisplay,
+           "text");
+    
     $("#ModeDisplay").click(function() {
         var newSetVal = (autoSetStatus==1?0:1);
         $.post("clock.php",
@@ -96,6 +115,13 @@ $(document).ready(function() {
         $.post("clock.php",
                "{\"action\":\"manual\", \"h\":\""+h+"\", \"m\":\""+m+"\"}",
                changeSetDisplay,
+               "text");
+    });
+    
+    $("#PlayDisplay").click(function() {
+        $.post("clock.php",
+               "{\"action\":\"music\"}",
+               changeMusicDisplay,
                "text");
     });
 });

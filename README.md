@@ -4,7 +4,7 @@
 
 The first version of [Feathermay's Clockshop](http://littlebits.cc/projects/feathermay-s-clock-shop) was a 2014 project where I built and programmed a working clock. This second version is an attempt to make a better, internet-connected clock using a [Particle Photon](https://docs.particle.io/guide/getting-started/intro/photon/).
 
-This clock uses two MCU boards: Particle Photon and [Arduino at Heart bit](https://littlebits.cc/bits/arduino). The former acts as an interface to the web to the latter through a simple serial connection. The latter controls the display, tracks changes in time, and turns the MP3 player on and off. [Click here](https://raw.githubusercontent.com/andreburto/clockshop2/master/src/insides.jpg) to see the electronic components.
+This clock uses two MCU boards: Particle Photon and [Arduino at Heart bit](https://littlebits.cc/bits/arduino). The former acts as an interface to the web to the latter through a simple serial connection. The latter controls the display, tracks changes in time, and turns the MP3 player on and off. [Click here](https://raw.githubusercontent.com/andreburto/clockshop2/master/img/insides.jpg) to see the electronic components.
 
 ### Component List
 

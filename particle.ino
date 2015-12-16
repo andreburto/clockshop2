@@ -57,7 +57,7 @@ int setTime(String data_load) {
     String t = data_load.substring(0,1);
     String v = data_load.substring(1);
     // Once you manually set auto is tured off
-    autoset = false;
+    autoset = 0;
     // The value to return
     int retval = -1;
     // Set the hour
@@ -86,8 +86,7 @@ void manualSync() {
 }
 
 void keepSync() {
-    if (autoset != 1) return;
-    if (millis() > start) {
+    if (autoset == 1 && millis() > start) {
         if (millis() > lastSync+oneHour) {
             manualSync();
         }

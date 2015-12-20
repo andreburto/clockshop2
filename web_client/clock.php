@@ -42,9 +42,24 @@ function setTimeAuto() {
     outputData(json_encode(array('status'=>1,'autoset'=>$json['return_value'])));
 }
 
+function playStopMusic() {
+    global $ACCESS_TOKEN;
+    $data = sprintf("access_token=%s", $ACCESS_TOKEN);
+    $res = postRequest($data, "playmusic");
+    $json = json_decode($res, true);
+    outputData(json_encode(array('status'=>1,'playstop'=>$json['return_value'])));}
+
 function checkMode() {
+    getVariable("autoset");
+}
+
+function checkMusic() {
+    getVariable("playstop");
+}
+
+function getVariable($varname) {
     global $DEVICEID, $ACCESS_TOKEN;
-    $url = "https://api.particle.io/v1/devices/".$DEVICEID."/autoset?access_token=".$ACCESS_TOKEN;
+    $url = "https://api.particle.io/v1/devices/".$DEVICEID."/".$varname."?access_token=".$ACCESS_TOKEN;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HEADER, false);
@@ -81,6 +96,12 @@ try {
             break;
         case "auto":
             setTimeAuto();
+            break;
+        case "music":
+            playStopMusic();
+            break;
+        case "checkmusic":
+            checkMusic();
             break;
         default:
             checkMode();

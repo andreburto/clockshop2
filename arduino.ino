@@ -78,6 +78,10 @@ void execCommand() {
     case 71:
       digitalWrite(digo, LOW);
       break;
+    default:
+      if (valCmd < 60 && valCmd >= 0) {
+        numbers[valCmd] = valDat;
+      }
   }
 }
 

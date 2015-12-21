@@ -1,8 +1,8 @@
 <?php
 
 // Manually input data
-$DEVICEID = "";
-$ACCESS_TOKEN = "";
+$DEVICEID = "2c001b000747343339373536";
+$ACCESS_TOKEN = "68fb9af1ef92b09aa4534e185fdaeb32af816267";
 
 // Accepted JSON
 $json_input = json_decode(file_get_contents('php://input'), true);
@@ -57,6 +57,14 @@ function checkMusic() {
     getVariable("playstop");
 }
 
+function setdisplay() {
+    global $ACCESS_TOKEN, $json_input;
+    $data = sprintf("access_token=%s&args=%s", $ACCESS_TOKEN, strval($json_input['dv']));
+    $res = postRequest($data, "setdisplay");
+    $json = json_decode($res, true);
+    outputData(json_encode(array('status'=>1,'dispval'=>$json['return_value'])));    
+}
+
 function getVariable($varname) {
     global $DEVICEID, $ACCESS_TOKEN;
     $url = "https://api.particle.io/v1/devices/".$DEVICEID."/".$varname."?access_token=".$ACCESS_TOKEN;
@@ -102,6 +110,9 @@ try {
             break;
         case "checkmusic":
             checkMusic();
+            break;
+        case "setdisplay":
+            setDisplay();
             break;
         default:
             checkMode();

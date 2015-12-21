@@ -45,6 +45,15 @@ function changeSetDisplay(data) {
     $("#SetDisplayText").text(json.msg);
 }
 
+function changeUpdateDisplay(data) {
+    var json = makeJson(data);
+    if (json.dispval == 1) {
+        $("#SetUpdateDisplayText").text("Success");
+    } else {
+        $("#SetUpdateDisplayText").text(json.dispval);
+    }
+}
+
 function changeMusicDisplay(data) {
     var json = makeJson(data);
     if (json.playstop == 0) {
@@ -76,6 +85,16 @@ function changeMusicDisplay(data) {
         </div>
         <div id="PlayDisplay" style="margin:0px;padding:0px;width:320px;height:100px;float:left;">
             <h1 id="SetPlayText"></h1>
+        </div>
+        <div id="UpdateDisplay" style="margin:0px;padding:0px;width:320px;height:auto;float:left;background-color:#c0c0e0;">
+            <span style="font-size:18pt;font-weight:bold;">Number:</span>
+            <input type="text" maxlength="6" style="font-size:16pt;width:150px;" id="numVal" value="" />
+            <br/>
+            <span style="font-size:18pt;font-weight:bold;">Display:</span>
+            <input type="text" maxlength="6" style="font-size:16pt;width:150px;" id="dispVal" value="" />
+            <br/>
+            <input type="button" id="SetNumDisplay" value="Set Display" style="font-size:16pt;" />
+            <h3 id="SetUpdateDisplayText"></h3>
         </div>
     </div>
 </form>
@@ -123,6 +142,15 @@ $(document).ready(function() {
                "{\"action\":\"music\"}",
                changeMusicDisplay,
                "text");
+    });
+    
+    $("#SetNumDisplay").click(function() {
+        var nv = $("#numVal").val();
+        var dv = $("#dispVal").val();
+        $.post("clock.php",
+               "{\"action\":\"setdisplay\", \"dv\":\""+nv+","+dv+"\"}",
+               changeUpdateDisplay,
+               "text");     
     });
 });
 

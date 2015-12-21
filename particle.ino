@@ -118,11 +118,22 @@ int playStop(String val) {
     return playstop;
 }
 
+int setDisplay(String val) {
+    int eq_pos = val.indexOf(',', 0);
+    if (eq_pos == -1) return -1;
+    String d = val.substring(0, eq_pos);
+    String v = val.substring(eq_pos+1);
+    intToOut(d.toInt());
+    intToOut(v.toInt());
+    return 1;
+}
+
 void setup() {
     // Expose funtion
     Particle.function("settime", setTime);
     Particle.function("setmanual", setManual);
     Particle.function("playmusic", playStop);
+    Particle.function("setdisplay", setDisplay);
     
     // Expose variables
     Particle.variable("autoset", &autoset, INT);

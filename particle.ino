@@ -75,14 +75,17 @@ int setTime(String data_load) {
 }
 
 void manualSync() {
+    // Resets autoset to true
+    autoset = 1;
+    // Sets the time of the last sync
+    lastSync = millis();
+    // Syncs with the cloud
     Particle.syncTime();
     // Wait for the return
     delay(1000);
     // Set the time
     setHour(Time.hour());
     setMinute(Time.minute());
-    // Resets autoset to true
-    autoset = 1;
 }
 
 void keepSync() {

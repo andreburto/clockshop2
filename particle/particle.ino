@@ -4,14 +4,14 @@ int numbers [] = { // HOURS
                   0, 3, 6, 8, 10,       //0-4
                   13,15,18,21,23,       //5-9
                   25,27,30,32,34,       //10-14
-                  38,40,43,44,48,       //15-19
+                  38,40,43,44,46,       //15-19
                   50,52,55,57,          //20-23
                   
                    // MINUTES
                   0, 2, 5, 7, 10,       //0-4
                   12,14,16,18,20,       //5-9
                   22,25,27,33,36,       //10-14
-                  37,40,43,44,47,       //15-19
+                  37,40,42,43,46,       //15-19
                   50,52,55,58,61,       //20-24
                   64,66,69,71,74,       //25-29
                   76,79,81,84,86,       //30-34
@@ -19,7 +19,7 @@ int numbers [] = { // HOURS
                   102,104,106,108,110,  //40-44
                   113,115,118,120,123,  //45-49
                   126,129,132,134,136,  //50-54
-                  138,141,143,145,147}; //55-59
+                  138,141,143,144,146}; //55-59
 
 // Data writing constants
 const int MAX_LEN = 8;
@@ -52,10 +52,8 @@ const int HOUR_START = 0;
 unsigned long LAST_TIME_CHECK;
 unsigned long NEXT_TIME_CHECK;
 unsigned long CHANGE_TIME_WAIT = 1000;
-// Counterto change stated time
-int MINUTE_TRACK = 0;
-int HOUR_TRACK = 0;
 // Counters to track current time
+int SECOND_COUNT = 0;
 int MINUTE_COUNT = 0;
 int HOUR_COUNT = 0;
 
@@ -63,7 +61,6 @@ int HOUR_COUNT = 0;
 int autoset = 1;
 // Play or Stop indicator
 int playstop = 0;
-
 
 // Write out a serial true or false signal
 void writeOut(int data) {
@@ -190,30 +187,25 @@ void keepTime() {
         LAST_TIME_CHECK = NEXT_TIME_CHECK;
         NEXT_TIME_CHECK = TIME_NOW + CHANGE_TIME_WAIT;
         
-        MINUTE_TRACK++;
+        SECOND_COUNT++;
         
-        if (MINUTE_TRACK == 60) {
-            MINUTE_TRACK = 0;
+        if (SECOND_COUNT > 59) {
+            SECOND_COUNT = 0;
+            
             MINUTE_COUNT++;
             
-            if (MINUTE_COUNT == 60) {
+            if (MINUTE_COUNT > 59) {
                 MINUTE_COUNT = 0;
+
+                HOUR_COUNT++;
+                
+                if (HOUR_COUNT > 23) {
+                    HOUR_COUNT = 0;
+                }
             }
             
             setMinute(MINUTE_COUNT);
-            
-            HOUR_TRACK++;
-            
-            if (HOUR_TRACK == 60) {
-                HOUR_TRACK = 0;
-                HOUR_COUNT++;
-                
-                if (HOUR_COUNT == 24) {
-                    HOUR_COUNT = 0;
-                }
-                
-                setHour(HOUR_COUNT);
-            }
+            setHour(HOUR_COUNT);
         }
     }
     
@@ -235,7 +227,7 @@ void setup() {
     // Expose variables
     Particle.variable("autoset", &autoset, INT);
     Particle.variable("playstop", &playstop, INT);
-    
+
     // Setup the mode of the pins
     pinMode(pinSig, OUTPUT);
     pinMode(pinDat, OUTPUT);

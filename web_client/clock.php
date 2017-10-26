@@ -1,8 +1,8 @@
 <?php
 
 // Manually input data
-$DEVICEID = "2c001b000747343339373536";
-$ACCESS_TOKEN = "68fb9af1ef92b09aa4534e185fdaeb32af816267";
+$DEVICEID = "<removing_deviceid>";
+$ACCESS_TOKEN = "<removing_token>";
 
 // Accepted JSON
 $json_input = json_decode(file_get_contents('php://input'), true);
